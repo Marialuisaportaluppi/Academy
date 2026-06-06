@@ -1,0 +1,1820 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Glam Aura Academy — ISO/IEC 42001:2023</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9A84C;
+    --gold-light: #E8C97A;
+    --gold-dim: #7A6130;
+    --black: #0A0A0A;
+    --surface: #111111;
+    --surface2: #1A1A1A;
+    --surface3: #222222;
+    --border: rgba(201,168,76,0.18);
+    --border-strong: rgba(201,168,76,0.4);
+    --text: #F0EDE4;
+    --text-muted: #888070;
+    --text-dim: #554F42;
+    --green: #4CAF7A;
+    --red: #E05A4A;
+    --blue: #4A90C9;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--black);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── LAYOUT ── */
+  #app { display: flex; min-height: 100vh; }
+
+  /* ── SIDEBAR ── */
+  #sidebar {
+    width: 280px;
+    min-width: 280px;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+  .sidebar-header {
+    padding: 28px 24px 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  .academy-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.22em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .academy-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 300;
+    color: var(--text);
+    line-height: 1.2;
+  }
+  .academy-title em {
+    font-style: italic;
+    color: var(--gold-light);
+  }
+  .course-tag {
+    margin-top: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    color: var(--gold-dim);
+    border: 1px solid var(--border);
+    padding: 4px 10px;
+    border-radius: 2px;
+  }
+
+  .sidebar-progress {
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--border);
+  }
+  .progress-label {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+  }
+  .progress-bar-bg {
+    height: 2px;
+    background: var(--surface3);
+    border-radius: 1px;
+    overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold-dim), var(--gold));
+    border-radius: 1px;
+    transition: width 0.6s ease;
+  }
+
+  .nav-section { padding: 10px 0; }
+  .nav-section-label {
+    padding: 8px 24px 4px;
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.16em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+  .nav-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 10px 24px;
+    cursor: pointer;
+    transition: background 0.2s;
+    border-left: 2px solid transparent;
+    position: relative;
+  }
+  .nav-item:hover { background: var(--surface2); }
+  .nav-item.active {
+    background: rgba(201,168,76,0.06);
+    border-left-color: var(--gold);
+  }
+  .nav-item.completed .nav-num { background: var(--gold); color: var(--black); }
+  .nav-num {
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    border: 1px solid var(--border-strong);
+    border-radius: 50%;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    margin-top: 1px;
+  }
+  .nav-text {}
+  .nav-title { font-size: 12px; font-weight: 400; color: var(--text); line-height: 1.3; }
+  .nav-sub { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 16px 24px;
+    border-top: 1px solid var(--border);
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+  }
+
+  /* ── MAIN ── */
+  #main {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 100vh;
+  }
+
+  /* ── PANELS ── */
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  /* ── HERO / WELCOME ── */
+  .hero {
+    padding: 60px 56px 40px;
+    border-bottom: 1px solid var(--border);
+    background: radial-gradient(ellipse at 70% 0%, rgba(201,168,76,0.04) 0%, transparent 60%);
+  }
+  .hero-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .hero-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 48px;
+    font-weight: 300;
+    line-height: 1.1;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+  .hero-title em { font-style: italic; color: var(--gold-light); }
+  .hero-subtitle {
+    font-size: 15px;
+    color: var(--text-muted);
+    max-width: 560px;
+    line-height: 1.7;
+    margin-bottom: 32px;
+  }
+  .hero-meta {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+  .hero-meta-item {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .hero-meta-val {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px;
+    font-weight: 300;
+    color: var(--gold-light);
+  }
+  .hero-meta-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+
+  /* ── MODULE GRID ── */
+  .modules-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1px;
+    background: var(--border);
+    margin: 0;
+  }
+  .module-card {
+    background: var(--black);
+    padding: 28px 32px;
+    cursor: pointer;
+    transition: background 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .module-card:hover { background: var(--surface); }
+  .module-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 3px; height: 0;
+    background: var(--gold);
+    transition: height 0.3s ease;
+  }
+  .module-card:hover::before { height: 100%; }
+  .module-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 52px;
+    font-weight: 300;
+    color: var(--text-dim);
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .module-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 20px;
+    font-weight: 400;
+    color: var(--text);
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+  .module-desc { font-size: 12px; color: var(--text-muted); line-height: 1.6; margin-bottom: 14px; }
+  .module-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    padding: 3px 8px;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    border-radius: 2px;
+  }
+  .tag.gold { border-color: var(--gold-dim); color: var(--gold-dim); }
+  .module-price {
+    position: absolute;
+    top: 28px; right: 28px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: var(--gold-dim);
+    letter-spacing: 0.06em;
+  }
+
+  /* ── LESSON VIEW ── */
+  .lesson-header {
+    padding: 40px 56px 32px;
+    border-bottom: 1px solid var(--border);
+    background: radial-gradient(ellipse at 80% 50%, rgba(201,168,76,0.03) 0%, transparent 50%);
+  }
+  .lesson-back {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--text-dim);
+    cursor: pointer;
+    margin-bottom: 24px;
+    text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .lesson-back:hover { color: var(--gold); }
+  .lesson-eyebrow {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .lesson-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 38px;
+    font-weight: 300;
+    color: var(--text);
+    line-height: 1.15;
+    margin-bottom: 14px;
+  }
+  .lesson-meta-row {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .lesson-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    padding: 4px 10px;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    border-radius: 2px;
+    text-transform: uppercase;
+  }
+
+  /* ── CONTENT BODY ── */
+  .content-body {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 0;
+    min-height: calc(100vh - 200px);
+  }
+  .lesson-content {
+    padding: 40px 48px;
+    border-right: 1px solid var(--border);
+    overflow-y: auto;
+  }
+  .lesson-content h3 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 22px;
+    font-weight: 400;
+    color: var(--gold-light);
+    margin: 32px 0 14px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .lesson-content h3:first-child { margin-top: 0; }
+  .lesson-content p {
+    font-size: 14px;
+    line-height: 1.8;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+  }
+  .lesson-content ul {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 16px;
+  }
+  .lesson-content li {
+    display: flex;
+    gap: 10px;
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.7;
+    margin-bottom: 8px;
+    padding-left: 2px;
+  }
+  .lesson-content li::before {
+    content: '—';
+    color: var(--gold-dim);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .clause-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--gold);
+    padding: 16px 20px;
+    margin: 20px 0;
+    border-radius: 0 2px 2px 0;
+  }
+  .clause-box .clause-ref {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .clause-box p { margin-bottom: 0; font-size: 13px; }
+  .comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 12px;
+  }
+  .comparison-table th {
+    background: var(--surface2);
+    color: var(--gold-light);
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 10px 14px;
+    text-align: left;
+    border: 1px solid var(--border);
+  }
+  .comparison-table td {
+    padding: 10px 14px;
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    line-height: 1.6;
+    vertical-align: top;
+  }
+  .comparison-table tr:hover td { background: var(--surface); }
+  .pillars-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin: 16px 0;
+  }
+  .pillar-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 14px 16px;
+    border-radius: 2px;
+  }
+  .pillar-card .pillar-title {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--gold-light);
+    margin-bottom: 5px;
+  }
+  .pillar-card p { font-size: 11px; margin-bottom: 0; }
+
+  /* ── AI TUTOR PANEL ── */
+  .ai-panel {
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 200px);
+    position: sticky;
+    top: 0;
+  }
+  .ai-panel-header {
+    padding: 20px 24px 16px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+  .ai-avatar {
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--gold);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 14px;
+    color: var(--gold);
+  }
+  .ai-info {}
+  .ai-name {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text);
+  }
+  .ai-status {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    color: var(--green);
+  }
+  .ai-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px 20px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .ai-messages::-webkit-scrollbar { width: 3px; }
+  .ai-messages::-webkit-scrollbar-track { background: transparent; }
+  .ai-messages::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 2px; }
+  .msg {
+    max-width: 88%;
+    animation: fadeUp 0.3s ease;
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .msg.user { align-self: flex-end; }
+  .msg.ai { align-self: flex-start; }
+  .msg-bubble {
+    padding: 10px 14px;
+    border-radius: 2px;
+    font-size: 12px;
+    line-height: 1.65;
+  }
+  .msg.user .msg-bubble {
+    background: rgba(201,168,76,0.1);
+    border: 1px solid var(--border-strong);
+    color: var(--text);
+    border-radius: 2px 2px 0 2px;
+  }
+  .msg.ai .msg-bubble {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    border-radius: 2px 2px 2px 0;
+  }
+  .msg-sender {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+  }
+  .msg.user .msg-sender { text-align: right; }
+  .typing-indicator {
+    display: flex;
+    gap: 4px;
+    padding: 12px 14px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 2px 2px 2px 0;
+    align-self: flex-start;
+    max-width: 60px;
+  }
+  .typing-dot {
+    width: 5px; height: 5px;
+    background: var(--text-dim);
+    border-radius: 50%;
+    animation: bounce 1.2s infinite;
+  }
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes bounce {
+    0%,60%,100% { transform: translateY(0); }
+    30% { transform: translateY(-4px); }
+  }
+
+  .quick-questions {
+    padding: 12px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+  .quick-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+  .quick-btn {
+    background: var(--surface3);
+    border: 1px solid var(--border);
+    color: var(--text-muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    padding: 7px 12px;
+    text-align: left;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.2s;
+    line-height: 1.4;
+  }
+  .quick-btn:hover {
+    background: rgba(201,168,76,0.06);
+    border-color: var(--gold-dim);
+    color: var(--text);
+  }
+
+  .ai-input-area {
+    padding: 14px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .ai-input {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    padding: 9px 14px;
+    border-radius: 2px;
+    outline: none;
+    resize: none;
+    line-height: 1.5;
+    transition: border-color 0.2s;
+  }
+  .ai-input::placeholder { color: var(--text-dim); }
+  .ai-input:focus { border-color: var(--gold-dim); }
+  .ai-send {
+    background: var(--gold);
+    border: none;
+    color: var(--black);
+    width: 36px;
+    height: 36px;
+    border-radius: 2px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+    align-self: flex-end;
+    flex-shrink: 0;
+  }
+  .ai-send:hover { background: var(--gold-light); }
+  .ai-send:disabled { background: var(--text-dim); cursor: not-allowed; }
+
+  /* ── QUIZ PANEL ── */
+  .quiz-section {
+    padding: 40px 48px;
+    border-top: 1px solid var(--border);
+  }
+  .quiz-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 28px;
+  }
+  .quiz-header-text {}
+  .quiz-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 24px;
+    font-weight: 300;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .quiz-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .quiz-question {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 24px 28px;
+    margin-bottom: 16px;
+  }
+  .q-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    color: var(--gold-dim);
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .q-text {
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.6;
+    margin-bottom: 18px;
+    font-weight: 400;
+  }
+  .q-options { display: flex; flex-direction: column; gap: 8px; }
+  .q-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 11px 16px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 2px;
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+  .q-option:hover:not(.disabled) {
+    border-color: var(--gold-dim);
+    color: var(--text);
+    background: rgba(201,168,76,0.04);
+  }
+  .q-option.correct {
+    border-color: var(--green);
+    background: rgba(76,175,122,0.06);
+    color: var(--text);
+  }
+  .q-option.wrong {
+    border-color: var(--red);
+    background: rgba(224,90,74,0.06);
+    color: var(--text-muted);
+  }
+  .q-option.disabled { cursor: default; }
+  .opt-letter {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    color: var(--gold-dim);
+    padding-top: 2px;
+    min-width: 16px;
+  }
+  .q-feedback {
+    display: none;
+    padding: 10px 14px;
+    font-size: 12px;
+    line-height: 1.6;
+    border-radius: 2px;
+    margin-top: 10px;
+  }
+  .q-feedback.correct {
+    background: rgba(76,175,122,0.08);
+    border: 1px solid rgba(76,175,122,0.3);
+    color: #7FD4A8;
+    display: block;
+  }
+  .q-feedback.wrong {
+    background: rgba(224,90,74,0.08);
+    border: 1px solid rgba(224,90,74,0.3);
+    color: #E8907E;
+    display: block;
+  }
+
+  /* ── DASHBOARD ── */
+  .dash-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    background: var(--border);
+    margin: 32px 0 0;
+  }
+  .dash-card {
+    background: var(--black);
+    padding: 28px 32px;
+  }
+  .dash-val {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 40px;
+    font-weight: 300;
+    color: var(--gold-light);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .dash-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+  }
+  .cert-section {
+    padding: 40px 56px;
+    border-top: 1px solid var(--border);
+  }
+  .cert-box {
+    background: var(--surface);
+    border: 1px solid var(--border-strong);
+    padding: 32px 40px;
+    max-width: 600px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cert-box::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+  }
+  .cert-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-style: italic;
+    color: var(--gold-light);
+    margin-bottom: 6px;
+  }
+  .cert-sub { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; }
+  .cert-progress-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  /* ── FLOW DIAGRAM (Module 4) ── */
+  .flow-chain {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 20px 0;
+    max-width: 400px;
+  }
+  .flow-node {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    padding: 12px 20px;
+    font-size: 12px;
+    color: var(--text);
+    position: relative;
+  }
+  .flow-node .flow-role {
+    font-family: 'DM Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    color: var(--gold-dim);
+    margin-bottom: 3px;
+    text-transform: uppercase;
+  }
+  .flow-node .flow-desc { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+  .flow-arrow {
+    width: 1px;
+    height: 20px;
+    background: var(--border-strong);
+    margin-left: 20px;
+    position: relative;
+  }
+  .flow-arrow::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: -3px;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    border-top: 5px solid var(--gold-dim);
+  }
+
+  /* ── DATA ELEMENTS (Module 3) ── */
+  .data-elements { display: flex; flex-direction: column; gap: 8px; margin: 16px 0; }
+  .data-el {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 12px 16px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+  }
+  .data-el-num {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 28px;
+    font-weight: 300;
+    color: var(--gold-dim);
+    line-height: 1;
+    min-width: 28px;
+  }
+  .data-el-content {}
+  .data-el-title { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+  .data-el-desc { font-size: 11px; color: var(--text-muted); line-height: 1.5; }
+
+  /* ── BUTTONS ── */
+  .btn-gold {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--gold);
+    color: var(--black);
+    border: none;
+    padding: 12px 24px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: background 0.2s;
+  }
+  .btn-gold:hover { background: var(--gold-light); }
+  .btn-outline {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid var(--border);
+    padding: 11px 22px;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+  .btn-outline:hover { border-color: var(--gold-dim); color: var(--text); }
+
+  /* ── MISC ── */
+  .divider { height: 1px; background: var(--border); margin: 32px 0; }
+  .section-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+  }
+
+  @media (max-width: 900px) {
+    #sidebar { display: none; }
+    .content-body { grid-template-columns: 1fr; }
+    .ai-panel { height: auto; min-height: 500px; }
+    .modules-grid { grid-template-columns: 1fr; }
+    .hero { padding: 32px 24px; }
+    .lesson-header { padding: 28px 24px; }
+    .lesson-content { padding: 24px; }
+    .quiz-section { padding: 24px; }
+    .pillars-grid { grid-template-columns: 1fr; }
+    .dash-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div id="app">
+  <!-- SIDEBAR -->
+  <nav id="sidebar">
+    <div class="sidebar-header">
+      <div class="academy-label">Glam Aura</div>
+      <div class="academy-title"><em>Academy</em></div>
+      <div class="course-tag">ISO/IEC 42001:2023</div>
+    </div>
+    <div class="sidebar-progress">
+      <div class="progress-label">
+        <span>Avanzamento</span>
+        <span id="progress-pct">0%</span>
+      </div>
+      <div class="progress-bar-bg">
+        <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Panoramica</div>
+      <div class="nav-item active" onclick="showPanel('welcome')">
+        <div class="nav-num">◈</div>
+        <div class="nav-text">
+          <div class="nav-title">Dashboard</div>
+          <div class="nav-sub">Il tuo percorso</div>
+        </div>
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Moduli del Corso</div>
+      <div class="nav-item" id="nav-m1" onclick="showLesson(1)">
+        <div class="nav-num">1</div>
+        <div class="nav-text">
+          <div class="nav-title">Governance e Leadership</div>
+          <div class="nav-sub">Clause 4-5 · €350–500</div>
+        </div>
+      </div>
+      <div class="nav-item" id="nav-m2" onclick="showLesson(2)">
+        <div class="nav-num">2</div>
+        <div class="nav-text">
+          <div class="nav-title">AI Risk & Impact Assessment</div>
+          <div class="nav-sub">Clause 6 · €450–600</div>
+        </div>
+      </div>
+      <div class="nav-item" id="nav-m3" onclick="showLesson(3)">
+        <div class="nav-num">3</div>
+        <div class="nav-text">
+          <div class="nav-title">Gestione Dati e Qualità</div>
+          <div class="nav-sub">Annex A.7 · €400–550</div>
+        </div>
+      </div>
+      <div class="nav-item" id="nav-m4" onclick="showLesson(4)">
+        <div class="nav-num">4</div>
+        <div class="nav-text">
+          <div class="nav-title">Supply Chain e Terze Parti</div>
+          <div class="nav-sub">Annex A.10 · €300–450</div>
+        </div>
+      </div>
+    </div>
+    <div class="sidebar-footer">
+      © 2026 Portaluppi Cyber & Privacy<br>
+      glamaura.it · ISO/IEC 42001:2023
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main id="main">
+
+    <!-- WELCOME / DASHBOARD -->
+    <div class="panel active" id="panel-welcome">
+      <div class="hero">
+        <div class="hero-eyebrow">Glam Aura Hub — Portaluppi Academy</div>
+        <div class="hero-title">Sistema di Gestione<br><em>dell'Intelligenza Artificiale</em></div>
+        <div class="hero-subtitle">Percorso formativo certificato ISO/IEC 42001:2023. Trasforma i requisiti normativi in leve competitive. Governance responsabile dell'IA per professionisti del Fashion, Legal e Compliance.</div>
+        <div class="hero-meta">
+          <div class="hero-meta-item">
+            <div class="hero-meta-val">4</div>
+            <div class="hero-meta-label">Moduli</div>
+          </div>
+          <div class="hero-meta-item">
+            <div class="hero-meta-val">16+</div>
+            <div class="hero-meta-label">Clausole ISO</div>
+          </div>
+          <div class="hero-meta-item">
+            <div class="hero-meta-val">AI</div>
+            <div class="hero-meta-label">Tutor integrato</div>
+          </div>
+          <div class="hero-meta-item">
+            <div class="hero-meta-val">∞</div>
+            <div class="hero-meta-label">Accesso ai contenuti</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modules-grid">
+        <div class="module-card" onclick="showLesson(1)">
+          <div class="module-price">€350–500</div>
+          <div class="module-num">01</div>
+          <div class="module-title">Governance e Leadership nell'IA</div>
+          <div class="module-desc">Abilita l'Alta Direzione e il Governing Body a definire la direzione strategica per integrare l'IA nei processi di business in modo responsabile e misurabile.</div>
+          <div class="module-tags">
+            <span class="tag gold">Clause 4.1–5.3</span>
+            <span class="tag">Executive Coaching</span>
+            <span class="tag">AIMS</span>
+          </div>
+        </div>
+        <div class="module-card" onclick="showLesson(2)">
+          <div class="module-price">€450–600</div>
+          <div class="module-num">02</div>
+          <div class="module-title">AI Risk Assessment e Impact Assessment</div>
+          <div class="module-desc">Competenze tecniche per distinguere tra rischi organizzativi e impatti sociali. Redazione della Dichiarazione di Applicabilità (SoA) conforme alla norma.</div>
+          <div class="module-tags">
+            <span class="tag gold">Clause 6.1.2–6.1.4</span>
+            <span class="tag">DPO · Risk Manager</span>
+            <span class="tag">SoA</span>
+          </div>
+        </div>
+        <div class="module-card" onclick="showLesson(3)">
+          <div class="module-price">€400–550</div>
+          <div class="module-num">03</div>
+          <div class="module-title">Gestione dei Dati e Qualità nel Ciclo di Vita IA</div>
+          <div class="module-desc">Requisiti tecnici per Data Quality, provenance e documentazione dei dataset. Audit-ready per ispezioni di terza parte.</div>
+          <div class="module-tags">
+            <span class="tag gold">Annex A.7 · B.4.3</span>
+            <span class="tag">Data Scientist</span>
+            <span class="tag">AI Developers</span>
+          </div>
+        </div>
+        <div class="module-card" onclick="showLesson(4)">
+          <div class="module-price">€300–450</div>
+          <div class="module-num">04</div>
+          <div class="module-title">Supply Chain e Relazioni con Terze Parti</div>
+          <div class="module-desc">Gestione della catena di fornitura AI. L'Organizzazione non può esternalizzare la propria responsabilità per i rischi legati all'IA.</div>
+          <div class="module-tags">
+            <span class="tag gold">Annex A.10 · Clause 8.1</span>
+            <span class="tag">Procurement</span>
+            <span class="tag">Vendor Manager</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="cert-section">
+        <div class="cert-box">
+          <div class="cert-title">Certificazione del Percorso</div>
+          <div class="cert-sub">Completa tutti i moduli e supera i quiz per ottenere l'attestato Glam Aura Academy — ISO/IEC 42001:2023</div>
+          <div class="cert-progress-label">
+            <span>Moduli completati</span>
+            <span id="cert-count">0 / 4</span>
+          </div>
+          <div class="progress-bar-bg">
+            <div class="progress-bar-fill" id="cert-fill" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODULE 1 -->
+    <div class="panel" id="panel-m1">
+      <div class="lesson-header">
+        <div class="lesson-back" onclick="showPanel('welcome')">← Torna alla Dashboard</div>
+        <div class="lesson-eyebrow">Modulo 01 · ISO/IEC 42001:2023</div>
+        <div class="lesson-title">Governance e Leadership<br>nell'Intelligenza Artificiale</div>
+        <div class="lesson-meta-row">
+          <span class="lesson-badge">Clause 4.1 — 5.3</span>
+          <span class="lesson-badge">Target: Alta Direzione · DPO · Compliance</span>
+          <span class="lesson-badge">Executive Coaching</span>
+        </div>
+      </div>
+      <div class="content-body">
+        <div class="lesson-content">
+          <h3>Obiettivo del Modulo</h3>
+          <p>Questo modulo abilita l'Alta Direzione e il Governing Body a definire la direzione strategica necessaria per integrare l'IA nei processi di business. L'obiettivo è assicurare che il Sistema di Gestione dell'IA (AIMS) non sia un silos isolato, ma un motore di fiducia e Prestazione misurabile.</p>
+
+          <h3>Analisi del Contesto (Clause 4.1)</h3>
+          <p>L'Organizzazione deve determinare i fattori interni ed esterni rilevanti per la propria finalità e che influenzano la capacità di raggiungere i risultati attesi del Sistema di Gestione dell'IA.</p>
+          <div class="clause-box">
+            <div class="clause-ref">Clause 4.1 — Requisito Obbligatorio</div>
+            <p>L'Organizzazione deve obbligatoriamente determinare se il cambiamento climatico sia un tema rilevante per il proprio contesto operativo. Questo rappresenta una novità rispetto agli standard ISO precedenti.</p>
+          </div>
+
+          <h3>Parti Interessate (Clause 4.2)</h3>
+          <p>Comprensione delle esigenze e delle aspettative delle parti interessate (stakeholder) che influenzano il Sistema di Gestione dell'IA. Include dipendenti, clienti, autorità di vigilanza, partner commerciali e la società in senso ampio.</p>
+
+          <h3>I 4 Pilastri della Leadership (Clause 5.1)</h3>
+          <p>Per garantire il successo dell'AIMS, l'Alta Direzione deve dimostrare attivamente la propria leadership su quattro dimensioni fondamentali:</p>
+          <div class="pillars-grid">
+            <div class="pillar-card">
+              <div class="pillar-title">1. Assicurare i Risultati</div>
+              <p>Garantire che l'AIMS raggiunga i risultati attesi attraverso guida attiva e supervisione continua.</p>
+            </div>
+            <div class="pillar-card">
+              <div class="pillar-title">2. Integrazione Strategica</div>
+              <p>Incorporare i requisiti del sistema nei processi core dell'Organizzazione, non come add-on.</p>
+            </div>
+            <div class="pillar-card">
+              <div class="pillar-title">3. Risorse e Supporto</div>
+              <p>Provvedere alle risorse necessarie e supportare i ruoli gestionali nel dimostrare la loro leadership.</p>
+            </div>
+            <div class="pillar-card">
+              <div class="pillar-title">4. Cultura del Miglioramento</div>
+              <p>Promuovere attivamente il Miglioramento continuo e comunicare l'importanza della gestione efficace dell'IA.</p>
+            </div>
+          </div>
+
+          <h3>Politica dell'IA (Clause 5.2 · Annex A.2.2)</h3>
+          <p>L'Alta Direzione deve definire una Politica dell'IA allineata ai valori e agli obiettivi strategici dell'Organizzazione. La Politica deve essere documentata, comunicata internamente e resa disponibile alle parti interessate pertinenti.</p>
+          <ul>
+            <li>Essere appropriata alla finalità dell'Organizzazione</li>
+            <li>Fornire un quadro di riferimento per stabilire gli obiettivi dell'IA</li>
+            <li>Includere l'impegno al rispetto dei requisiti applicabili</li>
+            <li>Includere l'impegno al Miglioramento continuo dell'AIMS</li>
+          </ul>
+
+          <h3>Ruoli, Responsabilità e Autorità (Clause 5.3 · Annex A.3.2)</h3>
+          <p>L'Alta Direzione deve assegnare e comunicare le responsabilità e le autorità per i ruoli rilevanti per l'AIMS. Ciò garantisce la Conformità e il reporting trasparente delle performance del sistema.</p>
+
+          <div class="section-actions">
+            <button class="btn-gold" onclick="showQuiz(1)">Verifica le Competenze →</button>
+            <button class="btn-outline" onclick="showLesson(2)">Modulo 2 →</button>
+          </div>
+        </div>
+        <div class="ai-panel" id="tutor-m1">
+          <div class="ai-panel-header">
+            <div class="ai-avatar">GA</div>
+            <div class="ai-info">
+              <div class="ai-name">Tutor AI — Modulo 1</div>
+              <div class="ai-status">● Attivo</div>
+            </div>
+          </div>
+          <div class="ai-messages" id="msgs-m1">
+            <div class="msg ai">
+              <div class="msg-sender">Tutor Glam Aura</div>
+              <div class="msg-bubble">Benvenuta nel Modulo 1 sulla Governance e Leadership nell'IA secondo ISO/IEC 42001:2023. Sono qui per rispondere a qualsiasi domanda sui contenuti. Come posso aiutarti?</div>
+            </div>
+          </div>
+          <div class="quick-questions">
+            <div class="quick-label">Domande rapide</div>
+            <button class="quick-btn" onclick="askQuick('m1','Cosa si intende per AIMS e qual è la sua struttura base secondo ISO 42001?')">Cos'è un AIMS?</button>
+            <button class="quick-btn" onclick="askQuick('m1','Qual è la differenza tra Governing Body e Alta Direzione nella Clause 5.1?')">Governing Body vs Alta Direzione</button>
+            <button class="quick-btn" onclick="askQuick('m1','Perché il cambiamento climatico è menzionato nella Clause 4.1 di ISO 42001?')">Perché il clima in Clause 4.1?</button>
+          </div>
+          <div class="ai-input-area">
+            <textarea class="ai-input" id="input-m1" rows="2" placeholder="Fai una domanda sul modulo…"></textarea>
+            <button class="ai-send" id="send-m1" onclick="sendMsg('m1')">↑</button>
+          </div>
+        </div>
+      </div>
+      <!-- QUIZ -->
+      <div class="quiz-section" id="quiz-m1" style="display:none">
+        <div class="quiz-header">
+          <div class="quiz-header-text">
+            <div class="quiz-title">Verifica delle Competenze — Modulo 1</div>
+            <div class="quiz-sub">3 domande sulla Governance e Leadership ISO/IEC 42001:2023</div>
+          </div>
+        </div>
+        <div id="quiz-questions-m1"></div>
+      </div>
+    </div>
+
+    <!-- MODULE 2 -->
+    <div class="panel" id="panel-m2">
+      <div class="lesson-header">
+        <div class="lesson-back" onclick="showPanel('welcome')">← Torna alla Dashboard</div>
+        <div class="lesson-eyebrow">Modulo 02 · ISO/IEC 42001:2023</div>
+        <div class="lesson-title">AI Risk Assessment<br><em>e Impact Assessment</em></div>
+        <div class="lesson-meta-row">
+          <span class="lesson-badge">Clause 6.1.2 — 6.1.4</span>
+          <span class="lesson-badge">Target: Risk Manager · DPO · Legal</span>
+          <span class="lesson-badge">Technical Specialist</span>
+        </div>
+      </div>
+      <div class="content-body">
+        <div class="lesson-content">
+          <h3>Outcome Formativo</h3>
+          <p>Al termine di questo modulo, avrai la capacità di redigere una Dichiarazione di Applicabilità (SoA) conforme e di giustificare rigorosamente l'esclusione dei controlli non applicabili (Clause 6.1.3). Saprai distinguere tra rischi organizzativi e impatti sociali con precisione normativa.</p>
+
+          <h3>Processo di AI Risk Assessment (Clause 6.1.2)</h3>
+          <p>Il Risk Assessment è un processo sistematico per l'identificazione, l'analisi e la valutazione del Rischio che può influenzare gli obiettivi dell'IA dell'Organizzazione. È orientato ai rischi interni — operativi, reputazionali, legali.</p>
+          <ul>
+            <li>Identificazione delle fonti di rischio e dei potenziali eventi</li>
+            <li>Analisi della probabilità di occorrenza e dell'impatto atteso</li>
+            <li>Valutazione comparativa rispetto ai criteri di rischio accettabile</li>
+            <li>Documentazione dei risultati per la Dichiarazione di Applicabilità</li>
+          </ul>
+
+          <h3>Trattamento del Rischio (Clause 6.1.3)</h3>
+          <p>Sulla base dei risultati del Risk Assessment, l'Organizzazione seleziona i controlli appropriati dall'Annex A e approva formalmente il rischio residuo. La SoA deve includere giustificazione per ogni controllo incluso o escluso.</p>
+
+          <h3>AI System Impact Assessment (Clause 6.1.4 · Annex A.5)</h3>
+          <p>Distinto dal Risk Assessment, l'Impact Assessment valuta le conseguenze del sistema AI su individui, gruppi e società, includendo l'uso improprio prevedibile. È orientato verso l'esterno — diritti fondamentali, equità, sicurezza.</p>
+
+          <h3>Confronto Operativo: Risk vs. Impact (Clause 3.24)</h3>
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th>Caratteristica</th>
+                <th>AI Risk Assessment (6.1.2)</th>
+                <th>AI Impact Assessment (6.1.4)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Focus principale</td>
+                <td>Rischio per l'Organizzazione e i suoi Obiettivi</td>
+                <td>Impatti su individui, gruppi e società</td>
+              </tr>
+              <tr>
+                <td>Fattori critici</td>
+                <td>Probabilità e impatto sulla Prestazione aziendale</td>
+                <td>Contesto sociale, giurisdizione, uso improprio prevedibile</td>
+              </tr>
+              <tr>
+                <td>Diritti Umani</td>
+                <td>Considerati come fonte di Rischio legale/reputazionale</td>
+                <td>Focus centrale su benessere fisico, psicologico e diritti (A.5)</td>
+              </tr>
+              <tr>
+                <td>Output mandatorio</td>
+                <td>Piano di trattamento e Dichiarazione di Applicabilità</td>
+                <td>Documentazione sistematica delle conseguenze sociali (Clause 8.4)</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>Pianificazione Operativa (Clause 8.1)</h3>
+          <p>L'Organizzazione deve pianificare, implementare, controllare, monitorare e riesaminare i processi necessari per soddisfare i requisiti del Sistema di Gestione dell'IA, con particolare attenzione alla gestione dei cambiamenti pianificati e non pianificati.</p>
+
+          <div class="section-actions">
+            <button class="btn-gold" onclick="showQuiz(2)">Verifica le Competenze →</button>
+            <button class="btn-outline" onclick="showLesson(3)">Modulo 3 →</button>
+          </div>
+        </div>
+        <div class="ai-panel" id="tutor-m2">
+          <div class="ai-panel-header">
+            <div class="ai-avatar">GA</div>
+            <div class="ai-info">
+              <div class="ai-name">Tutor AI — Modulo 2</div>
+              <div class="ai-status">● Attivo</div>
+            </div>
+          </div>
+          <div class="ai-messages" id="msgs-m2">
+            <div class="msg ai">
+              <div class="msg-sender">Tutor Glam Aura</div>
+              <div class="msg-bubble">Modulo 2: AI Risk Assessment e Impact Assessment. La distinzione tra questi due processi è la chiave per redigere una SoA conforme. Su cosa vuoi approfondire?</div>
+            </div>
+          </div>
+          <div class="quick-questions">
+            <div class="quick-label">Domande rapide</div>
+            <button class="quick-btn" onclick="askQuick('m2','Come si redige una Dichiarazione di Applicabilità (SoA) conforme alla Clause 6.1.3 di ISO 42001?')">Come si redige la SoA?</button>
+            <button class="quick-btn" onclick="askQuick('m2','In cosa consiste concretamente un AI System Impact Assessment secondo la Clause 6.1.4?')">Cosa include l Impact Assessment?</button>
+            <button class="quick-btn" onclick="askQuick('m2','Qual è la relazione tra AI Risk Assessment e GDPR DPIA nel contesto fashion e luxury?')">ISO 42001 e DPIA GDPR</button>
+          </div>
+          <div class="ai-input-area">
+            <textarea class="ai-input" id="input-m2" rows="2" placeholder="Fai una domanda sul modulo…"></textarea>
+            <button class="ai-send" id="send-m2" onclick="sendMsg('m2')">↑</button>
+          </div>
+        </div>
+      </div>
+      <div class="quiz-section" id="quiz-m2" style="display:none">
+        <div class="quiz-header">
+          <div class="quiz-header-text">
+            <div class="quiz-title">Verifica delle Competenze — Modulo 2</div>
+            <div class="quiz-sub">3 domande sul Risk e Impact Assessment ISO/IEC 42001:2023</div>
+          </div>
+        </div>
+        <div id="quiz-questions-m2"></div>
+      </div>
+    </div>
+
+    <!-- MODULE 3 -->
+    <div class="panel" id="panel-m3">
+      <div class="lesson-header">
+        <div class="lesson-back" onclick="showPanel('welcome')">← Torna alla Dashboard</div>
+        <div class="lesson-eyebrow">Modulo 03 · ISO/IEC 42001:2023</div>
+        <div class="lesson-title">Gestione dei Dati e Qualità<br><em>nel Ciclo di Vita IA</em></div>
+        <div class="lesson-meta-row">
+          <span class="lesson-badge">Annex A.7 · B.4.3</span>
+          <span class="lesson-badge">Target: Data Scientist · AI Developers · DBA</span>
+          <span class="lesson-badge">Data Excellence</span>
+        </div>
+      </div>
+      <div class="content-body">
+        <div class="lesson-content">
+          <h3>Perché Funziona</h3>
+          <p>Questo modulo assicura che la Competenza tecnica sia supportata da processi documentali che resistano a un Audit di terza parte. La qualità del dato non è un problema tecnico — è un requisito normativo misurabile.</p>
+
+          <h3>Gestione dei Dati (Annex A.7.2)</h3>
+          <p>Implementazione di processi documentati per lo sviluppo e il potenziamento dei sistemi AI. Ogni fase del ciclo di vita del dato deve essere tracciabile e verificabile.</p>
+
+          <h3>Acquisizione e Selezione (Annex A.7.3)</h3>
+          <p>Documentazione rigorosa dei criteri di selezione dei dati utilizzati per l'addestramento. Il perché di ogni dataset deve essere giustificabile durante un audit.</p>
+
+          <h3>I 5 Elementi della Documentazione (Annex B.4.3)</h3>
+          <p>La documentazione dei dati deve identificare chiaramente i seguenti cinque elementi per ogni dataset:</p>
+          <div class="data-elements">
+            <div class="data-el">
+              <div class="data-el-num">1</div>
+              <div class="data-el-content">
+                <div class="data-el-title">Provenance</div>
+                <div class="data-el-desc">Origine storica e proprietà dei dati. Chi li ha raccolti, quando e con quale autorizzazione.</div>
+              </div>
+            </div>
+            <div class="data-el">
+              <div class="data-el-num">2</div>
+              <div class="data-el-content">
+                <div class="data-el-title">Tagging Metadati</div>
+                <div class="data-el-desc">Date di ultimo aggiornamento e modifiche effettuate. Versioning del dataset.</div>
+              </div>
+            </div>
+            <div class="data-el">
+              <div class="data-el-num">3</div>
+              <div class="data-el-content">
+                <div class="data-el-title">Categorie Machine Learning</div>
+                <div class="data-el-desc">Distinzione netta tra set di training, validation, test e produzione.</div>
+              </div>
+            </div>
+            <div class="data-el">
+              <div class="data-el-num">4</div>
+              <div class="data-el-content">
+                <div class="data-el-title">Processi di Labelling</div>
+                <div class="data-el-desc">Metodi e criteri utilizzati per l'etichettatura dei dati. Chi ha etichettato e con quali istruzioni.</div>
+              </div>
+            </div>
+            <div class="data-el">
+              <div class="data-el-num">5</div>
+              <div class="data-el-content">
+                <div class="data-el-title">Bias e Retention</div>
+                <div class="data-el-desc">Identificazione dei bias noti e politiche di conservazione e smaltimento dei dati.</div>
+              </div>
+            </div>
+          </div>
+
+          <h3>Data Provenance (Annex A.7.5)</h3>
+          <p>Registrazione sistematica del processo di provenienza durante l'intero ciclo di vita del dato. Non solo "da dove viene" ma la catena completa di custodia e trasformazione.</p>
+
+          <h3>Risorse di Calcolo e Strumenti (Annex A.4.4 · A.4.5)</h3>
+          <p>Documentazione di hardware, software e tooling utilizzati per lo sviluppo e il dispiegamento dei sistemi AI. Requisito spesso trascurato ma verificato in ogni audit di terza parte.</p>
+
+          <div class="section-actions">
+            <button class="btn-gold" onclick="showQuiz(3)">Verifica le Competenze →</button>
+            <button class="btn-outline" onclick="showLesson(4)">Modulo 4 →</button>
+          </div>
+        </div>
+        <div class="ai-panel" id="tutor-m3">
+          <div class="ai-panel-header">
+            <div class="ai-avatar">GA</div>
+            <div class="ai-info">
+              <div class="ai-name">Tutor AI — Modulo 3</div>
+              <div class="ai-status">● Attivo</div>
+            </div>
+          </div>
+          <div class="ai-messages" id="msgs-m3">
+            <div class="msg ai">
+              <div class="msg-sender">Tutor Glam Aura</div>
+              <div class="msg-bubble">Modulo 3: Gestione dei Dati. La qualità del dato è il fondamento di ogni sistema AI conforme. Cosa vuoi approfondire sulla documentazione richiesta dall'Annex A.7?</div>
+            </div>
+          </div>
+          <div class="quick-questions">
+            <div class="quick-label">Domande rapide</div>
+            <button class="quick-btn" onclick="askQuick('m3','Cosa si intende per Data Provenance nel contesto ISO 42001 Annex A.7.5 e come si documenta?')">Come documentare la Data Provenance?</button>
+            <button class="quick-btn" onclick="askQuick('m3','Come si gestisce il problema del bias nei dataset secondo ISO 42001 Annex B.4.3?')">Gestire il bias nei dataset</button>
+            <button class="quick-btn" onclick="askQuick('m3','Cosa deve contenere la documentazione dei dati di training per superare un audit ISO 42001 di terza parte?')">Cosa verifica l audit sui dati?</button>
+          </div>
+          <div class="ai-input-area">
+            <textarea class="ai-input" id="input-m3" rows="2" placeholder="Fai una domanda sul modulo…"></textarea>
+            <button class="ai-send" id="send-m3" onclick="sendMsg('m3')">↑</button>
+          </div>
+        </div>
+      </div>
+      <div class="quiz-section" id="quiz-m3" style="display:none">
+        <div class="quiz-header">
+          <div class="quiz-header-text">
+            <div class="quiz-title">Verifica delle Competenze — Modulo 3</div>
+            <div class="quiz-sub">3 domande sulla Gestione dei Dati ISO/IEC 42001:2023</div>
+          </div>
+        </div>
+        <div id="quiz-questions-m3"></div>
+      </div>
+    </div>
+
+    <!-- MODULE 4 -->
+    <div class="panel" id="panel-m4">
+      <div class="lesson-header">
+        <div class="lesson-back" onclick="showPanel('welcome')">← Torna alla Dashboard</div>
+        <div class="lesson-eyebrow">Modulo 04 · ISO/IEC 42001:2023</div>
+        <div class="lesson-title">Supply Chain e<br><em>Relazioni con Terze Parti</em></div>
+        <div class="lesson-meta-row">
+          <span class="lesson-badge">Annex A.10 · Clause 8.1</span>
+          <span class="lesson-badge">Target: Procurement · Vendor Manager</span>
+          <span class="lesson-badge">Strategic Sourcing</span>
+        </div>
+      </div>
+      <div class="content-body">
+        <div class="lesson-content">
+          <h3>Il Principio Fondamentale</h3>
+          <p>L'Organizzazione non può esternalizzare la propria responsabilità per i rischi legati all'IA. Anche quando un sistema AI è sviluppato, ospitato o gestito da terze parti, l'Accountability rimane in capo all'Organizzazione. Questo è il principio cardine del Modulo 4.</p>
+
+          <h3>Flusso di Responsabilità nella Supply Chain</h3>
+          <div class="flow-chain">
+            <div class="flow-node">
+              <div class="flow-role">AI Provider</div>
+              Fornisce piattaforme, infrastrutture cloud e modelli base
+              <div class="flow-desc">Es. AWS, Azure, OpenAI — fornisce lo stack tecnologico</div>
+            </div>
+            <div class="flow-arrow"></div>
+            <div class="flow-node">
+              <div class="flow-role">AI Partner (Ruolo Critico)</div>
+              System Integrators e fornitori di dati specializzati
+              <div class="flow-desc">Personalizzano e integrano il sistema nel contesto specifico</div>
+            </div>
+            <div class="flow-arrow"></div>
+            <div class="flow-node">
+              <div class="flow-role">AI Producer</div>
+              Sviluppatori, Tester, Valutatori d'Impatto
+              <div class="flow-desc">Costruiscono, testano e certificano il sistema AI</div>
+            </div>
+            <div class="flow-arrow"></div>
+            <div class="flow-node">
+              <div class="flow-role">AI Customer</div>
+              Utenti finali e organizzazioni utilizzatrici
+              <div class="flow-desc">Deploiano il sistema in produzione — responsabilità massima</div>
+            </div>
+          </div>
+          <div class="clause-box">
+            <div class="clause-ref">Clause 4.1 — Nota 1</div>
+            <p>L'assenza di controllo su un partner non esenta l'Organizzazione dall'obbligo di monitorare la Prestazione del sistema. La delega non cancella la responsabilità.</p>
+          </div>
+
+          <h3>Allocazione delle Responsabilità (Annex A.10.2)</h3>
+          <p>Definizione documentata dei ruoli tra partner e fornitori. Ogni contratto con terze parti che sviluppano o gestiscono sistemi AI deve includere clausole specifiche di conformità ISO 42001.</p>
+
+          <h3>Controllo dei Fornitori (Annex A.10.3)</h3>
+          <p>Processi per garantire che i prodotti e servizi esterni rispettino l'approccio responsabile dell'Organizzazione. Include audit periodici, KPI di conformità e clausole contrattuali di uscita in caso di Non conformità.</p>
+
+          <h3>Relazione con i Clienti (Annex A.10.4)</h3>
+          <p>Integrazione delle aspettative del cliente nel design del sistema AI. Trasparenza sull'uso dell'IA nelle relazioni commerciali — requisito sempre più frequente nelle RFP enterprise.</p>
+
+          <h3>Controllo Operativo (Clause 8.1)</h3>
+          <p>Monitoraggio continuo dei processi affidati all'esterno. I processi esternalizzati rimangono nell'ambito del Sistema di Gestione dell'IA e devono essere monitorati come se fossero interni.</p>
+
+          <div class="section-actions">
+            <button class="btn-gold" onclick="showQuiz(4)">Verifica le Competenze →</button>
+            <button class="btn-outline" onclick="showPanel('welcome')">Torna alla Dashboard</button>
+          </div>
+        </div>
+        <div class="ai-panel" id="tutor-m4">
+          <div class="ai-panel-header">
+            <div class="ai-avatar">GA</div>
+            <div class="ai-info">
+              <div class="ai-name">Tutor AI — Modulo 4</div>
+              <div class="ai-status">● Attivo</div>
+            </div>
+          </div>
+          <div class="ai-messages" id="msgs-m4">
+            <div class="msg ai">
+              <div class="msg-sender">Tutor Glam Aura</div>
+              <div class="msg-bubble">Modulo 4: Supply Chain AI. Come gestisci la responsabilità quando il sistema AI è sviluppato da terzi? Esploriamo insieme i meccanismi dell'Annex A.10.</div>
+            </div>
+          </div>
+          <div class="quick-questions">
+            <div class="quick-label">Domande rapide</div>
+            <button class="quick-btn" onclick="askQuick('m4','Come strutturare contrattualmente le responsabilità AI con i fornitori secondo Annex A.10.2 di ISO 42001?')">Come strutturare i contratti AI?</button>
+            <button class="quick-btn" onclick="askQuick('m4','Quali clausole ISO 42001 inserire in un contratto con un AI Provider o System Integrator?')">Clausole contrattuali ISO 42001</button>
+            <button class="quick-btn" onclick="askQuick('m4','Come applicare ISO 42001 Annex A.10 nel contesto della supply chain del Fashion e Luxury?')">Supply chain fashion e ISO 42001</button>
+          </div>
+          <div class="ai-input-area">
+            <textarea class="ai-input" id="input-m4" rows="2" placeholder="Fai una domanda sul modulo…"></textarea>
+            <button class="ai-send" id="send-m4" onclick="sendMsg('m4')">↑</button>
+          </div>
+        </div>
+      </div>
+      <div class="quiz-section" id="quiz-m4" style="display:none">
+        <div class="quiz-header">
+          <div class="quiz-header-text">
+            <div class="quiz-title">Verifica delle Competenze — Modulo 4</div>
+            <div class="quiz-sub">3 domande sulla Supply Chain ISO/IEC 42001:2023</div>
+          </div>
+        </div>
+        <div id="quiz-questions-m4"></div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+const QUIZZES = {
+  1: [
+    {
+      q: "Secondo la Clause 4.1 di ISO/IEC 42001:2023, quale tema specifico — inusuale per gli standard ISO tradizionali — l'Organizzazione deve obbligatoriamente valutare nel contesto esterno?",
+      opts: ["La volatilità dei mercati finanziari","Il cambiamento climatico","La concorrenza con sistemi AI esteri","L'obsolescenza tecnologica dei dipendenti"],
+      correct: 1,
+      explanation: "Corretto. ISO 42001 è il primo standard ISO a richiedere esplicitamente la valutazione del cambiamento climatico come fattore di contesto (Clause 4.1). Questo riflette la crescente attenzione alle interdipendenze tra AI e sostenibilità ambientale."
+    },
+    {
+      q: "Quale dei seguenti NON è uno dei 4 Pilastri della Leadership richiesti dalla Clause 5.1 di ISO 42001?",
+      opts: ["Assicurare i Risultati del Sistema di Gestione","Integrazione Strategica nei processi core","Nomina di un Chief AI Officer certificato","Cultura del Miglioramento continuo"],
+      correct: 2,
+      explanation: "Esatto. La Clause 5.1 richiede: Assicurare i Risultati, Integrazione Strategica, Risorse e Supporto, Cultura del Miglioramento. Non esiste requisito di nominare un Chief AI Officer certificato — questo può essere una scelta organizzativa ma non è un requisito normativo."
+    },
+    {
+      q: "La Dichiarazione di Applicabilità (SoA) nella Clause 6.1.3 deve includere:",
+      opts: ["Solo i controlli dell'Annex A effettivamente implementati","Tutti i controlli dell'Annex A con giustificazione per inclusione o esclusione","Solo i controlli esclusi con relativa motivazione","I costi di implementazione di ogni controllo"],
+      correct: 1,
+      explanation: "Corretto. La SoA deve includere tutti i controlli dell'Annex A con la giustificazione sia per quelli inclusi che per quelli esclusi. L'esclusione di un controllo deve essere motivata — non si può semplicemente omettere."
+    }
+  ],
+  2: [
+    {
+      q: "Qual è la differenza fondamentale tra AI Risk Assessment (Clause 6.1.2) e AI System Impact Assessment (Clause 6.1.4)?",
+      opts: [
+        "Il Risk Assessment riguarda i rischi tecnici, l'Impact Assessment quelli legali",
+        "Il Risk Assessment è obbligatorio, l'Impact Assessment opzionale",
+        "Il Risk Assessment è orientato ai rischi per l'Organizzazione, l'Impact Assessment agli impatti su individui e società",
+        "Sono due nomi diversi per lo stesso processo"
+      ],
+      correct: 2,
+      explanation: "Esatto. Il Risk Assessment (6.1.2) si focalizza sui rischi per gli obiettivi dell'Organizzazione. L'Impact Assessment (6.1.4) valuta le conseguenze su individui, gruppi e società — incluso l'uso improprio prevedibile. Sono processi complementari ma distinti."
+    },
+    {
+      q: "Secondo la Clause 6.1.4 e l'Annex A.5, i Diritti Umani nell'Impact Assessment sono considerati:",
+      opts: [
+        "Un tema opzionale rilevante solo per organizzazioni nel settore pubblico",
+        "Focus centrale — con attenzione specifica al benessere fisico, psicologico e ai diritti fondamentali",
+        "Una fonte di rischio legale e reputazionale, non un obiettivo in sé",
+        "Coperti automaticamente dalla conformità al GDPR"
+      ],
+      correct: 1,
+      explanation: "Corretto. Nell'Impact Assessment (A.5), i Diritti Umani sono il focus centrale — non solo una fonte di rischio. ISO 42001 richiede una valutazione genuina del benessere delle persone, non solo una mappatura del rischio legale."
+    },
+    {
+      q: "L'output mandatorio del processo di AI Risk Assessment secondo Clause 6.1.3 è:",
+      opts: [
+        "Un report di audit interno annuale",
+        "La registrazione degli incidenti AI dell'anno precedente",
+        "Il piano di trattamento del rischio e la Dichiarazione di Applicabilità (SoA)",
+        "La nomina formale del Risk Manager"
+      ],
+      correct: 2,
+      explanation: "Corretto. Il piano di trattamento e la SoA sono gli output mandatori della Clause 6.1.3. La SoA è il documento che collega l'analisi del rischio alle scelte di controllo — è il cuore del Sistema di Gestione."
+    }
+  ],
+  3: [
+    {
+      q: "Secondo l'Annex B.4.3 di ISO 42001, quanti sono gli elementi che la documentazione di un dataset deve identificare chiaramente?",
+      opts: ["3 — Provenance, Qualità, Bias","4 — Training, Validation, Test, Produzione","5 — Provenance, Metadati, Categorie ML, Labelling, Bias e Retention","7 — uno per ogni fase del ciclo di vita"],
+      correct: 2,
+      explanation: "Corretto. L'Annex B.4.3 richiede 5 elementi: (1) Provenance, (2) Tagging Metadati, (3) Categorie ML (training/validation/test/produzione), (4) Processi di Labelling, (5) Bias noti e politiche di Retention. Tutti e cinque sono necessari per la conformità."
+    },
+    {
+      q: "Cosa si intende per 'Data Provenance' secondo l'Annex A.7.5?",
+      opts: [
+        "La valutazione della qualità statistica del dataset",
+        "La registrazione dell'origine e della catena completa di custodia e trasformazione del dato durante l'intero ciclo di vita",
+        "Il numero totale di record nel dataset",
+        "La data di scadenza della licenza d'uso dei dati"
+      ],
+      correct: 1,
+      explanation: "Esatto. Data Provenance (A.7.5) non è solo 'da dove viene' il dato, ma l'intera catena: chi lo ha raccolto, con quale autorizzazione, come è stato trasformato, chi lo ha custodito. Deve essere tracciabile per l'intero ciclo di vita."
+    },
+    {
+      q: "Perché la documentazione delle Risorse di Calcolo e degli Strumenti (Annex A.4.4-A.4.5) è un requisito frequentemente verificato negli audit di terza parte?",
+      opts: [
+        "Perché determina il costo di licenza del sistema AI",
+        "Perché le attrezzature obsolete sono una fonte di rischio cyber",
+        "Perché è necessaria per valutare la riproducibilità del sistema e l'impatto ambientale del training",
+        "Perché la norma la considera il requisito più rilevante"
+      ],
+      correct: 2,
+      explanation: "Corretto. Gli auditor verificano hardware, software e tooling perché permettono di valutare la riproducibilità del sistema (fondamentale per la conformità) e sempre più spesso l'impronta ambientale del training — collegato alla Clause 4.1 sul cambiamento climatico."
+    }
+  ],
+  4: [
+    {
+      q: "Il principio cardine della Supply Chain ISO 42001 stabilisce che:",
+      opts: [
+        "La responsabilità si trasferisce al fornitore nel momento della firma del contratto",
+        "L'Organizzazione non può esternalizzare la propria responsabilità per i rischi legati all'IA",
+        "Solo i fornitori certificati ISO 27001 possono sviluppare sistemi AI per terzi",
+        "Il fornitore è responsabile per i primi 12 mesi di operatività"
+      ],
+      correct: 1,
+      explanation: "Esatto. È il principio fondamentale del Modulo 4. Anche quando un sistema AI è sviluppato, ospitato o gestito da terzi, l'Accountability rimane in capo all'Organizzazione. La delega operativa non cancella la responsabilità normativa."
+    },
+    {
+      q: "Nel flusso AI Provider → AI Partner → AI Producer → AI Customer, quale ruolo è definito 'Critico' dalla norma e perché?",
+      opts: [
+        "AI Provider — perché fornisce l'infrastruttura base senza cui nulla funziona",
+        "AI Customer — perché è il soggetto che risponde agli utenti finali",
+        "AI Partner — perché personalizza il sistema nel contesto specifico ed è il punto di integrazione tra tecnologia e business",
+        "AI Producer — perché scrive il codice che genera i rischi"
+      ],
+      correct: 2,
+      explanation: "Corretto. L'AI Partner (System Integrator, fornitore di dati specializzato) è il ruolo critico perché opera nella zona di mezzo tra tecnologia generica e applicazione specifica. È il punto dove i rischi astratti diventano rischi concreti per l'Organizzazione."
+    },
+    {
+      q: "La Clause 8.1 stabilisce che i processi affidati a fornitori esterni:",
+      opts: [
+        "Escono dall'ambito del Sistema di Gestione dell'IA dell'Organizzazione",
+        "Devono essere certificati autonomamente dal fornitore entro 18 mesi",
+        "Rimangono nell'ambito del Sistema di Gestione e devono essere monitorati come se fossero interni",
+        "Sono coperti automaticamente dal contratto di servizio senza controlli aggiuntivi"
+      ],
+      correct: 2,
+      explanation: "Esatto. Clause 8.1 è chiara: esternalizzare un processo non lo esclude dall'AIMS. L'Organizzazione deve monitorarlo, misurarlo e mantenerlo sotto controllo esattamente come i processi interni. Questo spesso sorprende le organizzazioni durante il primo audit."
+    }
+  ]
+};
+
+const completed = new Set();
+const msgHistory = { m1: [], m2: [], m3: [], m4: [] };
+
+function showPanel(id) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if (id === 'welcome') {
+    document.querySelector('.nav-item[onclick="showPanel(\'welcome\')"]').classList.add('active');
+  }
+  window.scrollTo(0,0);
+  document.getElementById('main').scrollTo(0,0);
+}
+
+function showLesson(n) {
+  showPanel('m' + n);
+  const navItem = document.getElementById('nav-m' + n);
+  if (navItem) {
+    document.querySelectorAll('.nav-item').forEach(x => x.classList.remove('active'));
+    navItem.classList.add('active');
+  }
+}
+
+function showQuiz(n) {
+  const section = document.getElementById('quiz-m' + n);
+  section.style.display = 'block';
+  section.scrollIntoView({ behavior: 'smooth' });
+  const container = document.getElementById('quiz-questions-m' + n);
+  if (container.innerHTML) return;
+  renderQuiz(n, container);
+}
+
+function renderQuiz(n, container) {
+  const questions = QUIZZES[n];
+  questions.forEach((q, qi) => {
+    const letters = ['A','B','C','D'];
+    const opts = q.opts.map((o, oi) => `
+      <div class="q-option" id="opt-${n}-${qi}-${oi}" onclick="selectOpt(${n},${qi},${oi})">
+        <span class="opt-letter">${letters[oi]}</span>
+        <span>${o}</span>
+      </div>`).join('');
+    container.innerHTML += `
+      <div class="quiz-question">
+        <div class="q-num">Domanda ${qi + 1} di ${questions.length}</div>
+        <div class="q-text">${q.q}</div>
+        <div class="q-options" id="opts-${n}-${qi}">${opts}</div>
+        <div class="q-feedback" id="fb-${n}-${qi}"></div>
+      </div>`;
+  });
+}
+
+function selectOpt(n, qi, oi) {
+  const q = QUIZZES[n][qi];
+  const optsEl = document.getElementById('opts-' + n + '-' + qi);
+  if (optsEl.querySelector('.correct, .wrong')) return;
+  optsEl.querySelectorAll('.q-option').forEach(o => o.classList.add('disabled'));
+  const chosen = document.getElementById('opt-' + n + '-' + qi + '-' + oi);
+  const fb = document.getElementById('fb-' + n + '-' + qi);
+  if (oi === q.correct) {
+    chosen.classList.add('correct');
+    fb.className = 'q-feedback correct';
+    fb.textContent = '✓ ' + q.explanation;
+  } else {
+    chosen.classList.add('wrong');
+    document.getElementById('opt-' + n + '-' + qi + '-' + q.correct).classList.add('correct');
+    fb.className = 'q-feedback wrong';
+    fb.textContent = '✗ ' + q.explanation;
+  }
+  checkModuleComplete(n);
+}
+
+function checkModuleComplete(n) {
+  const questions = QUIZZES[n];
+  let allAnswered = true;
+  for (let qi = 0; qi < questions.length; qi++) {
+    const opts = document.getElementById('opts-' + n + '-' + qi);
+    if (!opts || !opts.querySelector('.correct, .wrong')) { allAnswered = false; break; }
+  }
+  if (allAnswered && !completed.has(n)) {
+    completed.add(n);
+    const navItem = document.getElementById('nav-m' + n);
+    if (navItem) navItem.classList.add('completed');
+    updateProgress();
+  }
+}
+
+function updateProgress() {
+  const pct = Math.round((completed.size / 4) * 100);
+  document.getElementById('progress-pct').textContent = pct + '%';
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('cert-fill').style.width = pct + '%';
+  document.getElementById('cert-count').textContent = completed.size + ' / 4';
+}
+
+// AI TUTOR
+async function sendMsg(module) {
+  const input = document.getElementById('input-' + module);
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+  appendMsg(module, 'user', text);
+  const btn = document.getElementById('send-' + module);
+  btn.disabled = true;
+  appendTyping(module);
+  try {
+    const systemPrompt = `Sei il Tutor AI della Glam Aura Academy, piattaforma e-learning di Marialuisa Portaluppi (DPO e Lead Auditor ISO 27001). Sei specializzato nel corso ISO/IEC 42001:2023 - Sistema di Gestione dell'Intelligenza Artificiale. Rispondi in italiano, con tono professionale e preciso. Cita sempre le Clause o gli Annex specifici quando pertinente. Risposte concise (max 180 parole) ma tecnicamente accurate. Non inventare requisiti normativi non presenti in ISO 42001. Il modulo corrente è il Modulo ${module.replace('m','')}.`;
+    const history = msgHistory[module].map(m => ({ role: m.role === 'user' ? 'user' : 'assistant', content: m.text }));
+    history.push({ role: 'user', content: text });
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: history
+      })
+    });
+    const data = await res.json();
+    removeTyping(module);
+    const reply = data.content?.[0]?.text || 'Risposta non disponibile.';
+    appendMsg(module, 'ai', reply);
+    msgHistory[module].push({ role: 'user', text }, { role: 'ai', text: reply });
+  } catch(e) {
+    removeTyping(module);
+    appendMsg(module, 'ai', 'Errore di connessione al tutor. Riprova.');
+  }
+  btn.disabled = false;
+}
+
+function askQuick(module, question) {
+  const input = document.getElementById('input-' + module);
+  input.value = question;
+  sendMsg(module);
+}
+
+function appendMsg(module, role, text) {
+  const container = document.getElementById('msgs-' + module);
+  const div = document.createElement('div');
+  div.className = 'msg ' + role;
+  div.innerHTML = `<div class="msg-sender">${role === 'user' ? 'Tu' : 'Tutor Glam Aura'}</div><div class="msg-bubble">${text.replace(/\n/g,'<br>')}</div>`;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function appendTyping(module) {
+  const container = document.getElementById('msgs-' + module);
+  const div = document.createElement('div');
+  div.className = 'msg ai';
+  div.id = 'typing-' + module;
+  div.innerHTML = `<div class="msg-sender">Tutor Glam Aura</div><div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>`;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function removeTyping(module) {
+  const t = document.getElementById('typing-' + module);
+  if (t) t.remove();
+}
+
+// Enter to send
+['m1','m2','m3','m4'].forEach(m => {
+  const inp = document.getElementById('input-' + m);
+  if (inp) inp.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMsg(m); }
+  });
+});
+</body>
+</html>
